@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ahmed - Dark Hacker</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/BnTf0kW/knight-logo.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+* {margin:0; padding:0; box-sizing:border-box;}
+body, html {height:100%; width:100%; overflow:hidden; background:black; font-family:'Share Tech Mono', monospace; user-select:none;}
+
+#matrix {position:fixed; top:0; left:0; width:100%; height:100%; z-index:0;}
+
+.loading-screen {
+  position:fixed; top:0; left:0; width:100%; height:100%; background:black; color:#00ff00;
+  display:flex; align-items:center; justify-content:center; font-size:2rem; z-index:10;
+}
+
+.container {
+  position:relative; z-index:5; max-width:400px; margin:40px auto; background:rgba(0,0,0,0.7);
+  border:1px solid #00ff00; border-radius:10px; padding:20px; text-align:center; color:#00ff00;
+  box-shadow:0 0 20px #00ff00aa;
+}
+
+.container img {
+  width:120px; border-radius:50%; margin-bottom:15px; border:2px solid #00ff00; box-shadow:0 0 20px #00ff00aa;
+}
+
+.container h1 {font-size:2rem; margin-bottom:10px; color:#00ff00; text-shadow:0 0 10px #00ff00;}
+.container p {font-size:1rem; margin-bottom:8px; line-height:1.5;}
+
+.links {display:flex; justify-content:center; gap:15px; margin-top:10px;}
+.links a {
+  text-decoration:none; color:#00ff00; border:2px solid #00ff00; padding:8px 15px;
+  border-radius:8px; font-size:1rem; transition:all 0.3s; box-shadow:0 0 10px #00ff00aa;
+}
+.links a:hover {
+  background:#00ff00; color:black; box-shadow:0 0 20px #00ff00;
+}
+
+#visitorCounter {margin-top:15px; font-size:0.9rem; color:#00ff00;}
+
+#audioControl {
+  position:fixed; bottom:10px; right:10px; background:black; border:1px solid #00ff00;
+  color:#00ff00; padding:5px 10px; border-radius:5px; cursor:pointer; z-index:10;
+}
+#audioControl:hover {background:#00ff00; color:black;}
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+<div class="loading-screen" id="loading">Loading... Verifying Access...</div>
+
+<div class="container" id="content" style="display:none;">
+  <img src="https://i.ibb.co/BnTf0kW/knight-logo.png" alt="Ahmed Logo">
+  <h1>Ahmed</h1>
+  <p>16 years old from Iraq</p>
+  <p>Passionate about programming</p>
+  <p>Exploring the hidden side of technology</p>
+  <div class="links">
+    <a href="https://t.me/hoopis_6" target="_blank">Telegram</a>
+    <a href="https://instagram.com/_92vt" target="_blank">Instagram</a>
+  </div>
+  <div id="visitorCounter">👁️ Visitors: <span id="count">0</span></div>
+</div>
+
+<div id="audioControl">🎵 Music: On</div>
+
+<audio id="bgMusic" src="https://files.catbox.moe/3t74l0.mp3" loop></audio>
+<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3" preload="auto"></audio>
+
+<script>
+// Matrix Background
+const c = document.getElementById("matrix");
+const ctx = c.getContext("2d");
+c.height = window.innerHeight;
+c.width = window.innerWidth;
+const matrix = "01";
+const font_size = 14;
+const columns = c.width / font_size;
+const drops = [];
+for (let x = 0; x < columns; x++) drops[x] = 1;
+
+function draw() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = "#0F0";
+  ctx.font = font_size + "px monospace";
+  for (let i = 0; i < drops.length; i++) {
+    const text = matrix.charAt(Math.floor(Math.random() * matrix.length));
+    ctx.fillText(text, i * font_size, drops[i] * font_size);
+    if (drops[i] * font_size > c.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+setInterval(draw, 33);
+
+window.addEventListener('resize', () => {
+  c.height = window.innerHeight;
+  c.width = window.innerWidth;
+});
+
+// Loading Screen
+setTimeout(() => {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+}, 2500);
+
+// Touch Effect + Sound
+document.addEventListener('click', (e) => {
+  const s = document.getElementById('clickSound');
+  s.currentTime = 0; s.play();
+  const spark = document.createElement('div');
+  spark.style.position = 'fixed';
+  spark.style.width = '15px';
+  spark.style.height = '15px';
+  spark.style.borderRadius = '50%';
+  spark.style.background = '#00ff00';
+  spark.style.left = e.clientX + 'px';
+  spark.style.top = e.clientY + 'px';
+  spark.style.pointerEvents = 'none';
+  spark.style.boxShadow = '0 0 10px #00ff00';
+  document.body.appendChild(spark);
+  setTimeout(() => { document.body.removeChild(spark); }, 300);
+});
+
+// Music Control
+const bgMusic = document.getElementById('bgMusic');
+const audioControl = document.getElementById('audioControl');
+bgMusic.volume = 0.2;
+bgMusic.play().catch(()=>{});
+let isPlaying = true;
+audioControl.addEventListener('click', () => {
+  if (isPlaying) { bgMusic.pause(); audioControl.textContent = '🎵 Music: Off'; }
+  else { bgMusic.play(); audioControl.textContent = '🎵 Music: On'; }
+  isPlaying = !isPlaying;
+});
+
+// Visitor Counter
+let count = localStorage.getItem('visitorCount') || 0;
+count++;
+localStorage.setItem('visitorCount', count);
+document.getElementById('count').textContent = count;
+</script>
+
+</body>
+</html>
